@@ -223,6 +223,10 @@ Setting this to nil or 0 will turn off the indicator."
   "Face to flash the current line."
   :group 'thing-edit)
 
+(defvar replace-things nil
+  "things type to replace")
+
+
 (defun thing-edit-internal (object-beg object-end &optional kill-conditional)
   "A fast edit complexes object.
 Argument OBJECT-BEG the begin position that object.
@@ -253,7 +257,9 @@ otherwise copy object."
   (save-excursion
     (thing-edit-internal (beginning-of-thing thing)
                          (end-of-thing thing)
-                         kill-conditional)))
+                         kill-conditional))
+  (setq replace-things thing)
+  )
 
 (defun thing-replace-internal (object-beg object-end)
   "A fast replace complexes object.
@@ -268,7 +274,9 @@ Argument OBJECT-END the end position of object."
   "This function is a simple interface for `thing-replace-internal'"
   (save-excursion
     (thing-replace-internal (beginning-of-thing thing)
-                            (end-of-thing thing))))
+                            (end-of-thing thing)))
+  (setq replace-things nil)
+  )
 
 ;;;###autoload
 (defun thing-cut-sexp ()
@@ -623,7 +631,9 @@ With the universal argument, the text will also be killed"
       (thing-edit-internal
        (match-beginning 0)
        (match-end 0)
-       kill-conditional))))
+       kill-conditional)))
+  (setq replace-things 'number)
+  )
 
 ;;;###autoload
 (defun thing-replace-number ()
@@ -680,7 +690,9 @@ otherwise copy object."
          (up-list)
          (forward-char -1)
          (point))
-       kill-conditional))))
+       kill-conditional)))
+  (setq replace-things 'parentheses)
+  )
 
 (defun thing-replace-parentheses ()
   "Replace content in match parentheses with the content of currnt line."
@@ -739,7 +751,9 @@ otherwise copy object."
                     (line-beginning-position)))
            (pos-end (or (and active (region-end))
                         (line-end-position))))
-      (thing-edit-internal pos pos-end kill-conditional))))
+      (thing-edit-internal pos pos-end kill-conditional)))
+  (setq replace-things 'region-or-line)
+  )
 
 (defun thing-cut-region-or-line ()
   "Cut content of the current region or line."
@@ -763,7 +777,9 @@ If `KILL-CONDITIONAL' is non-nil, kill object,
 otherwise copy object."
   (interactive)
   (save-excursion
-    (thing-edit-internal (point-min) (point-max) kill-conditional)))
+    (thing-edit-internal (point-min) (point-max) kill-conditional))
+  (setq replace-things 'buffer)
+  )
 
 (defun thing-cut-whole-buffer ()
   "Cut content of the current buffer."
